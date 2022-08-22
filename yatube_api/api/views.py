@@ -1,20 +1,21 @@
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
 from rest_framework.pagination import LimitOffsetPagination
 
 from .serializers import CommentSerializer, GroupSerializer
 from .serializers import FollowSerializer, PostSerializer
-from posts.models import Group, Follow, Post, User
+from posts.models import Group, Post, User
 from .permissions import IsOwnerOrReadOnly
 
 
 class PostViewSet(viewsets.ModelViewSet):
+    """Класс Пост для обработки  запросов:
+    GET,POST,DELETE,PATCH"""
     serializer_class = PostSerializer
     queryset = Post.objects.all()
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsOwnerOrReadOnly,)
     pagination_class = LimitOffsetPagination
 
     def perform_create(self, serializer):
@@ -22,8 +23,9 @@ class PostViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Класс Коментарии для обработки комментариев"""
     serializer_class = CommentSerializer
-    permission_classes = (IsOwnerOrReadOnly, IsAuthenticatedOrReadOnly, )
+    permission_classes = (IsOwnerOrReadOnly,)
 
     def perform_create(self, serializer):
         post_id = self.kwargs.get('post_id')
@@ -38,12 +40,13 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
+    """Класс Группы только для чтения"""
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
 
 class FollowViewSet(viewsets.ModelViewSet):
-    queryset = Follow.objects.all()
+    """Класс Follow для управлениями подписок пользователя"""
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
@@ -55,4 +58,5 @@ class FollowViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         following = get_object_or_404(User,
                                       username=self.request.user.username)
+
         return following.follower.all()
