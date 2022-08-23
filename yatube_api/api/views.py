@@ -3,6 +3,7 @@ from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import filters
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework import mixins
 
 from .serializers import CommentSerializer, GroupSerializer
 from .serializers import FollowSerializer, PostSerializer
@@ -45,7 +46,10 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = GroupSerializer
 
 
-class FollowViewSet(viewsets.ModelViewSet):
+class FollowViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin, viewsets. GenericViewSet
+):
     """Класс Follow для управлениями подписок пользователя"""
     serializer_class = FollowSerializer
     permission_classes = (IsAuthenticated,)
