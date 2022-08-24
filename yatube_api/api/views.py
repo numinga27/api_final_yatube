@@ -48,7 +48,7 @@ class GroupViewSet(viewsets.ReadOnlyModelViewSet):
 
 class FollowViewSet(
     mixins.CreateModelMixin,
-    mixins.ListModelMixin, viewsets. GenericViewSet
+    mixins.ListModelMixin, viewsets.GenericViewSet
 ):
     """Класс Follow для управлениями подписок пользователя"""
     serializer_class = FollowSerializer
@@ -60,7 +60,9 @@ class FollowViewSet(
         serializer.save(user=self.request.user)
 
     def get_queryset(self):
-        following = get_object_or_404(User,
-                                      username=self.request.user.username)
+        following = get_object_or_404(
+            User,
+            username=self.request.user.username
+        )
 
         return following.follower.all()
